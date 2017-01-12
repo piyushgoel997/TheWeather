@@ -1,5 +1,7 @@
 package com.example.piyush.theweather;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,9 +9,11 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView locTV,latTV,longTV,currTV,maxTV,minTV,humTV,preTV, wsTV;
 
     public static final String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=d97032aed691a5908653a4429329aadd";
+    public static final String OPEN_WEATHER_ICON_URL = "http://openweathermap.org/img/w/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +48,13 @@ public class MainActivity extends AppCompatActivity {
         preTV = (TextView) findViewById(R.id.tv_pressure);
         wsTV = (TextView) findViewById(R.id.tv_wind_speed);
 
-        setdata();
+        setData();
     }
 
-    private void setdata() {
-        Log.d(TAG, "setdata: called");
+    String weatherIconCode;
+
+    private void setData() {
+        Log.d(TAG, "setData: called");
         new getJSON().execute(OPEN_WEATHER_MAP_URL);
     }
 
@@ -56,21 +63,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected JSONObject doInBackground(String... params) {
             Log.d(TAG, "doInBackground: called");
-            HttpURLConnection connection = null;
-            BufferedReader reader = null;
-
             try {
                 Log.d(TAG, "doInBackground: "+params[0]);
                 URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-                InputStream stream = connection.getInputStream();
-                reader = new BufferedReader(new InputStreamReader(stream));
+                InputStream in = new BufferedInputStream(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-                String line = "";
                 String jsonString = "";
-                while ((line += reader.readLine()) != null) {
+                String line = reader.readLine();
+                while (line != null) {
                     jsonString += line + "\n";
+                    line = reader.readLine();
                 }
                 Log.d(TAG, "doInBackground: \n"+ jsonString);
                 return new JSONObject(jsonString);
@@ -89,12 +94,55 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             try {
+                JSONArray weatherArray = jsonObject.getJSONArray("weather");
+                JSONObject weather = weatherArray.getJSONObject(0);
+                JSONObject main = jsonObject.getJSONObject("main");
+                weatherIconCode = weather.getString("icon");
                 String city = jsonObject.getString("name");
+                String weatherDescription = weather.getString("description");
+                double tempCurr = main.getDouble("temp");
+                double tempMax = main.getDouble("temp_max");
+                double tempMin = main.getDouble("temp_min");
+                double humidity = main.getDouble("humidity");
                 locTV.setText(city);
+                currTV.setText("" + tempCurr);
+                maxTV.setText("" + tempMax);
+                minTV.setText("" + tempMin);
+                humTV.setText("" + humidity);
+                weatherConditionTV.setText(weatherDescription);
+                Log.d(TAG, "onPostExecute: " + weatherIconCode);
+
+
 
             } catch (JSONException e) {
                 Log.d(TAG, "onPostExecute: JSONException");
             }
+
+            new getIcon().execute(OPEN_WEATHER_ICON_URL + weatherIconCode + ".png");
+
         }
     }
+
+    public class getIcon extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            URL imageURL = null;
+            try {
+                imageURL = new URL(params[0]);
+                Log.d(TAG, "doInBackground: " + imageURL);
+                InputStream is = (InputStream) imageURL.getContent();
+                Bitmap bitmap = BitmapFactory.decodeStream(is);
+                return bitmap;
+            } catch (java.io.IOException e) {
+                Log.e(TAG, "doInBackground: ", e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            ivCondition.setImageBitmap(bitmap);
+        }
+    }
+
 }
