@@ -31,7 +31,8 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/tv_weather_condition"
+        android:layout_alignParentTop="true"
+        android:layout_below="@id/tv_weather_condition"
         android:layout_alignParentStart="true">
 
         <LinearLayout
@@ -105,38 +106,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Max Temperature : "
-                android:id="@+id/textView3"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="max"
-                android:id="@+id/tv_max_temp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Min Temperature : "
-                android:id="@+id/textView4"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="min"
-                android:id="@+id/tv_min_temp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="Humidity : "
                 android:id="@+id/textView5" />
             <TextView
@@ -160,22 +129,6 @@
                 android:layout_height="wrap_content"
                 android:text="pressure"
                 android:id="@+id/tv_pressure" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wind Speed : "
-                android:id="@+id/textView7" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="wind speed"
-                android:id="@+id/tv_wind_speed" />
         </LinearLayout>
 
     </LinearLayout>
